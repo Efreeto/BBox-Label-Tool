@@ -136,7 +136,7 @@ class LabelTool():
 ##            return
         # get image list
         self.imageDir = os.path.join(r'./Images', '%03d' %(self.category))
-        self.imageList = glob.glob(os.path.join(self.imageDir, '*.JPEG'))
+        self.imageList = sorted(glob.glob(os.path.join(self.imageDir, '*.JPEG')))
         if len(self.imageList) == 0:
             print ('No .JPEG images found in the specified dir!')
             return
