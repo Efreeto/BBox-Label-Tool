@@ -7,10 +7,10 @@
 #
 #-------------------------------------------------------------------------------
 from __future__ import division
-try:
+try:    # Python 3
     import tkinter
     import tkinter.messagebox
-except:
+except: # Python 2
     import Tkinter as tkinter
     import tkMessageBox
 from tkinter import *

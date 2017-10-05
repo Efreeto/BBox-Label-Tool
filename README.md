@@ -24,6 +24,14 @@ Startup
 -------
 $ python main.py
 
+Errors
+------
+ImportError: No module named '_tkinter'
+`sudo apt install python3-tk`
+
+ImportError: No module named 'PIL'
+`pip install image`
+
 Usage
 -----
 1. Input a number (e.g, 1, 2, 5...), and click 'Load'. The images along with a few example results will be loaded.
