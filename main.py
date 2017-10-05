@@ -75,6 +75,8 @@ class LabelTool():
         self.parent.bind("s", self.cancelBBox)
         self.parent.bind("a", self.prevImage) # press 'a' to go backforward
         self.parent.bind("d", self.nextImage) # press 'd' to go forward
+        self.parent.bind("z", self.zoomInImage) # press 'z' to zoom in
+        self.parent.bind("x", self.zoomOutImage) # press 'x' to zoom out
         self.mainPanel.grid(row = 1, column = 1, rowspan = 4, sticky = W+N)
 
         # showing bbox info & delete bbox
@@ -120,6 +122,8 @@ class LabelTool():
         self.frame.columnconfigure(1, weight = 1)
         self.frame.rowconfigure(4, weight = 1)
 
+        self.zoomScale = 1.0
+        
         # for debugging
 ##        self.setImage()
 ##        self.loadDir()
@@ -171,11 +175,12 @@ class LabelTool():
         self.loadImage()
         print ('%d images loaded from %s' %(self.total, s))
 
-    def loadImage(self):
+    def loadImage(self, scale=1.0):
         # load image
         imagepath = self.imageList[self.cur - 1]
         self.img = Image.open(imagepath)
-        self.tkimg = ImageTk.PhotoImage(self.img)
+        new_size = int(scale * self.img.size[0]), int(scale * self.img.size[1])
+        self.tkimg = ImageTk.PhotoImage(self.img.resize(new_size, Image.ANTIALIAS))
         self.mainPanel.config(width = max(self.tkimg.width(), 400), height = max(self.tkimg.height(), 400))
         self.mainPanel.create_image(0, 0, image = self.tkimg, anchor=NW)
         self.progLabel.config(text = "%04d/%04d" %(self.cur, self.total))
@@ -195,8 +200,8 @@ class LabelTool():
                     tmp = [int(t.strip()) for t in line.split()]
 ##                    print tmp
                     self.bboxList.append(tuple(tmp))
-                    tmpId = self.mainPanel.create_rectangle(tmp[0], tmp[1], \
-                                                            tmp[2], tmp[3], \
+                    tmpId = self.mainPanel.create_rectangle(tmp[0] * self.zoomScale, tmp[1] * self.zoomScale, \
+                                                            tmp[2] * self.zoomScale, tmp[3] * self.zoomScale, \
                                                             width = 2, \
                                                             outline = COLORS[(len(self.bboxList)-1) % len(COLORS)])
                     self.bboxIdList.append(tmpId)
@@ -209,11 +214,13 @@ class LabelTool():
             for bbox in self.bboxList:
                 f.write(' '.join(map(str, bbox)) + '\n')
         print ('Image No. %d saved' %(self.cur))
+        self.zoomScale = 1.0
 
 
     def mouseClick(self, event):
         if self.STATE['click'] == 0:
             self.STATE['x'], self.STATE['y'] = event.x, event.y
+            # self.STATE['x'], self.STATE['y'] = event.x * self.zoomScale, event.y * self.zoomScale
         else:
             x1, x2 = min(self.STATE['x'], event.x), max(self.STATE['x'], event.x)
             y1, y2 = min(self.STATE['y'], event.y), max(self.STATE['y'], event.y)
@@ -276,6 +283,14 @@ class LabelTool():
         if self.cur < self.total:
             self.cur += 1
             self.loadImage()
+
+    def zoomInImage(self, event = None):
+        self.zoomScale *= 2
+        self.loadImage(scale=self.zoomScale)
+
+    def zoomOutImage(self, event = None):
+        self.zoomScale *= 0.5
+        self.loadImage(scale=self.zoomScale)
 
     def gotoImage(self):
         idx = int(self.idxEntry.get())
