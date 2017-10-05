@@ -200,13 +200,13 @@ class LabelTool():
                     tmp = [float(t.strip()) for t in line.split()]
 ##                    print tmp
                     self.bboxList.append(tuple(tmp))
-                    radius = 0.1
+                    radius = 0.7
                     tmpId = self.mainPanel.create_oval((tmp[0]-radius) * self.zoomScale, (tmp[1]-radius) * self.zoomScale, \
                                                        (tmp[0]+radius) * self.zoomScale, (tmp[1]+radius) * self.zoomScale, \
-                                                       outline = COLORS[(len(self.bboxList)-1) % len(COLORS)])
-                    offset = 0.5
+                                                       fill = COLORS[(len(self.bboxList)-1) % len(COLORS)])
+                    offset = 2.0
                     textId = self.mainPanel.create_text((tmp[0]+offset) * self.zoomScale, (tmp[1]+offset) * self.zoomScale, \
-                                                        text=str(i))
+                                                        text=str(i), fill='cyan')
                     self.bboxIdList.append(tmpId)
                     self.listbox.insert(END, '(%.2f, %.2f)' %(tmp[0], tmp[1]))
                     self.listbox.itemconfig(len(self.bboxIdList) - 1, fg = COLORS[(len(self.bboxIdList) - 1) % len(COLORS)])
@@ -288,11 +288,11 @@ class LabelTool():
             self.loadImage()
 
     def zoomInImage(self, event = None):
-        self.zoomScale *= 2
+        self.zoomScale *= 1.25
         self.loadImage(scale=self.zoomScale)
 
     def zoomOutImage(self, event = None):
-        self.zoomScale *= 0.5
+        self.zoomScale *= 4/5
         self.loadImage(scale=self.zoomScale)
 
     def gotoImage(self):
