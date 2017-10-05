@@ -188,7 +188,7 @@ class LabelTool():
         # load labels
         self.clearBBox()
         self.imagename = os.path.split(imagepath)[-1].split('.')[0]
-        labelname = self.imagename + '.txt'
+        labelname = self.imagename + '.land'
         self.labelfilename = os.path.join(self.outDir, labelname)
         bbox_cnt = 0
         if os.path.exists(self.labelfilename):
@@ -197,15 +197,18 @@ class LabelTool():
                     if i == 0:
                         bbox_cnt = int(line.strip())
                         continue
-                    tmp = [int(t.strip()) for t in line.split()]
+                    tmp = [float(t.strip()) for t in line.split()]
 ##                    print tmp
                     self.bboxList.append(tuple(tmp))
-                    tmpId = self.mainPanel.create_rectangle(tmp[0] * self.zoomScale, tmp[1] * self.zoomScale, \
-                                                            tmp[2] * self.zoomScale, tmp[3] * self.zoomScale, \
-                                                            width = 2, \
-                                                            outline = COLORS[(len(self.bboxList)-1) % len(COLORS)])
+                    radius = 0.1
+                    tmpId = self.mainPanel.create_oval((tmp[0]-radius) * self.zoomScale, (tmp[1]-radius) * self.zoomScale, \
+                                                       (tmp[0]+radius) * self.zoomScale, (tmp[1]+radius) * self.zoomScale, \
+                                                       outline = COLORS[(len(self.bboxList)-1) % len(COLORS)])
+                    offset = 0.5
+                    textId = self.mainPanel.create_text((tmp[0]+offset) * self.zoomScale, (tmp[1]+offset) * self.zoomScale, \
+                                                        text=str(i))
                     self.bboxIdList.append(tmpId)
-                    self.listbox.insert(END, '(%d, %d) -> (%d, %d)' %(tmp[0], tmp[1], tmp[2], tmp[3]))
+                    self.listbox.insert(END, '(%.2f, %.2f)' %(tmp[0], tmp[1]))
                     self.listbox.itemconfig(len(self.bboxIdList) - 1, fg = COLORS[(len(self.bboxIdList) - 1) % len(COLORS)])
 
     def saveImage(self):
